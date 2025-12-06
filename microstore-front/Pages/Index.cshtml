@@ -1,0 +1,75 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Catalogue Produits - StoreFront";
+}
+
+<div class="container mt-4">
+    <!-- En-tête de la page -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-4 text-center mb-2">🛒 Catalogue de Produits</h1>
+            <p class="text-center text-muted">Microservices Demo - Kubernetes Workshop</p>
+        </div>
+    </div>
+
+    <!-- Gestion d'erreur : Affichage de l'alerte si le Backend est indisponible -->
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Erreur de chargement :</strong> @Model.ErrorMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Grille de produits (Bootstrap Cards responsive) -->
+    @if (Model.Products.Any())
+    {
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            @foreach (var product in Model.Products)
+            {
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        <!-- Image du produit -->
+                        <img src="@product.ImageUrl" 
+                             class="card-img-top" 
+                             alt="@product.Name"
+                             style="height: 200px; object-fit: cover;">
+                        
+                        <!-- Corps de la carte -->
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">@product.Name</h5>
+                            <p class="card-text text-muted small">ID: #@product.Id</p>
+                            
+                            <!-- Prix en bas de carte -->
+                            <div class="mt-auto">
+                                <p class="h4 text-primary mb-3">@product.Price.ToString("C2")</p>
+                                <button class="btn btn-outline-primary w-100" disabled>
+                                    🛍️ Commander (bientôt)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else if (string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <!-- Affichage si aucun produit n'est disponible (cas normal sans erreur) -->
+        <div class="alert alert-info text-center" role="alert">
+            <h4 class="alert-heading">Aucun produit disponible</h4>
+            <p>Le catalogue est vide pour le moment. Revenez plus tard !</p>
+        </div>
+    }
+</div>
+
+<!-- Footer informatif pour la démo -->
+<footer class="mt-5 py-3 bg-light">
+    <div class="container text-center text-muted">
+        <small>
+            <strong>Mode Développement :</strong> Données bouchonnées (MockProductService actif) 
+            | Backend API : Non connecté
+        </small>
+    </div>
+</footer>

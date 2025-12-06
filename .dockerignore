@@ -1,0 +1,24 @@
+# Fichiers de build et binaires
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+
+# Fichiers utilisateurs et IDE
+.vs/
+.vscode/
+*.user
+*.suo
+*.cache
+
+# Dépendances NuGet
+packages/
+*.nupkg
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
