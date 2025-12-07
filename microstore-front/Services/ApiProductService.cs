@@ -1,3 +1,4 @@
+using System.Net.Http.Json;
 using microstore_front.Models;
 
 namespace microstore_front.Services;
@@ -19,20 +20,19 @@ public class ApiProductService : IProductService
 
     public async Task<IEnumerable<Product>> GetProductsAsync()
     {
-        // TODO: Implémenter l'appel à l'API réelle
-        // Exemple:
-        // try
-        // {
-        //     var response = await _httpClient.GetAsync("/api/products");
-        //     response.EnsureSuccessStatusCode();
-        //     return await response.Content.ReadFromJsonAsync<IEnumerable<Product>>() ?? Enumerable.Empty<Product>();
-        // }
-        // catch (HttpRequestException ex)
-        // {
-        //     _logger.LogError(ex, "Erreur lors de l'appel à l'API Backend");
-        //     throw; // Sera géré par le PageModel
-        // }
+        try
+        {
+            // Appel au backend (la BaseAddress est injectée via Program.cs et les variables d'environnement)
+            var response = await _httpClient.GetAsync("api/products");
+            response.EnsureSuccessStatusCode();
 
-        throw new NotImplementedException("L'API Backend n'est pas encore prête. Utilisez MockProductService.");
+            var products = await response.Content.ReadFromJsonAsync<IEnumerable<Product>>();
+            return products ?? Enumerable.Empty<Product>();
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex, "Erreur lors de l'appel à ProductApi");
+            throw; // La page gère l'affichage d'un message utilisateur
+        }
     }
 }
