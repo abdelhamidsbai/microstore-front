@@ -9,21 +9,30 @@ builder.Services.AddRazorPages();
 // CONFIGURATION DES SERVICES - PATTERN REPOSITORY
 // ========================================
 
-// OPTION 1 (ACTUELLE) : Mock Service pour développement sans Backend
-builder.Services.AddScoped<IProductService, MockProductService>();
+// Déterminer si on utilise le Mock ou l'API réelle
+var useMockService = builder.Environment.IsDevelopment()
+    && string.IsNullOrEmpty(builder.Configuration["ProductApi:BaseUrl"]);
 
-// OPTION 2 (À ACTIVER PLUS TARD) : API Service avec HttpClient vers le Backend réel
-// Décommentez ces lignes et commentez la ligne ci-dessus quand le Backend sera prêt :
-/*
-builder.Services.AddHttpClient<IProductService, ApiProductService>(client =>
+if (useMockService)
 {
-    client.BaseAddress = new Uri(builder.Configuration["BackendUrl"] 
-        ?? throw new InvalidOperationException("BackendUrl non configurée dans appsettings.json"));
-    client.Timeout = TimeSpan.FromSeconds(30);
-});
-*/
+    // DÉVELOPPEMENT LOCAL : Mock Service sans Backend
+    builder.Services.AddScoped<IProductService, MockProductService>();
+}
+else
+{
+    // PRODUCTION / DOCKER : API Service avec HttpClient vers le Backend réel
+    var productApiBaseUrl = builder.Configuration["ProductApi:BaseUrl"]
+        ?? throw new InvalidOperationException("ProductApi:BaseUrl non configurée");
 
-// Note: Dans appsettings.json, ajoutez: "BackendUrl": "http://backend-api:8080"
+    builder.Services.AddHttpClient<IProductService, ApiProductService>(client =>
+    {
+        client.BaseAddress = new Uri(productApiBaseUrl);
+        client.Timeout = TimeSpan.FromSeconds(30);
+    });
+}
+
+// Configuration via variables d'environnement Docker :
+// docker run -e ProductApi__BaseUrl=http://localhost:5000 microstore-front:local
 
 var app = builder.Build();
 
